@@ -62,7 +62,7 @@
         const lightboxImg = document.getElementById("lightbox-img");
         if (!lightbox || !lightboxImg) return;
 
-        document.querySelectorAll("[data-lightbox] img, .update-card-img img, .about-photo img").forEach((img) => {
+        document.querySelectorAll(".update-card-img img, .about-photo img").forEach((img) => {
             img.addEventListener("click", () => {
                 lightboxImg.src = img.src;
                 lightboxImg.alt = img.alt;
@@ -82,6 +82,48 @@
             event.preventDefault();
             this.scrollBy({ left: primaryDelta, behavior: "auto" });
         }, { passive: false });
+    }
+
+    function initUpdateReadMore() {
+        const LIMIT = 90;
+        document.querySelectorAll(".update-title").forEach((el) => {
+            const fullText = el.textContent.trim();
+            if (fullText.length <= LIMIT) return;
+
+            let cut = fullText.slice(0, LIMIT);
+            const lastSpace = cut.lastIndexOf(" ");
+            if (lastSpace > 40) cut = cut.slice(0, lastSpace);
+
+            el.textContent = cut + "\u2026 ";
+
+            const readMore = document.createElement("button");
+            readMore.type = "button";
+            readMore.className = "update-read-more";
+            readMore.textContent = "Read more";
+            readMore.addEventListener("click", (event) => {
+                event.stopPropagation();
+                openTextLightbox(fullText);
+            });
+            el.appendChild(readMore);
+        });
+    }
+
+    function openTextLightbox(text) {
+        const lb = document.getElementById("textLightbox");
+        const content = document.getElementById("textLightbox-content");
+        if (!lb || !content) return;
+        content.textContent = text;
+        lb.classList.add("open");
+    }
+
+    function initTextLightbox() {
+        const lb = document.getElementById("textLightbox");
+        if (!lb) return;
+        const box = lb.querySelector(".text-lightbox-box");
+        const closeBtn = lb.querySelector(".lightbox-close");
+        lb.addEventListener("click", () => lb.classList.remove("open"));
+        if (box) box.addEventListener("click", (event) => event.stopPropagation());
+        if (closeBtn) closeBtn.addEventListener("click", () => lb.classList.remove("open"));
     }
 
     function initOrderForm() {
@@ -110,5 +152,7 @@
     if (page === "category") renderCategoryPage();
     initLightbox();
     initUpdatesScroll();
+    initUpdateReadMore();
+    initTextLightbox();
     initOrderForm();
 })();
